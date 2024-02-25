@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "./pkg/pb/order";
+service order{
+    rpc ProductStockMinus(ProductStockMinusRequest) returns(ProductStockMinusReponse){};
+}
+message ProductStockMinusRequest{
+    int64 ID=1;
+    int64 stock=2;
+}
+message ProductStockMinusReponse{
+    string Error=1;
+}
