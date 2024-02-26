@@ -34,8 +34,8 @@ func (c *userClient) UsersSignUp(user models.UserSignUp) (models.TokenUser, erro
 		Firstname: user.Firstname,
 		Lastname:  user.Lastname,
 		Email:     user.Email,
-		Phone:     user.Phone,
 		Password:  user.Password,
+		Phone:     user.Phone,
 	})
 	if err != nil {
 		return models.TokenUser{}, err
@@ -54,12 +54,13 @@ func (c *userClient) UsersSignUp(user models.UserSignUp) (models.TokenUser, erro
 		RefreshToken: res.RefreshToken,
 	}, nil
 }
-func (c *userClient) UsersLogin(user models.UserLogin) (models.TokenUser, error) {
-	res, err := c.Client.UserSignUp(context.Background(), &pb.UserSignUpRequest{
+func (c *userClient) UserLogin(user models.UserLogin) (models.TokenUser, error) {
+	res, err := c.Client.UserLogin(context.Background(), &pb.UserLoginRequest{
 		Email:    user.Email,
 		Password: user.Password,
 	})
 	if err != nil {
+		fmt.Println("🤷‍♂️")
 		return models.TokenUser{}, err
 	}
 	userDetails := models.UserDetails{

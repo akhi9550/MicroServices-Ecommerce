@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"grpc-api-gateway/pkg/helper"
 	"grpc-api-gateway/pkg/utils/response"
 	"net/http"
@@ -13,7 +12,6 @@ func UserAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		tokenString := helper.GetTokenFromHeader(authHeader)
-		// Validate the token and extract the user ID
 		if tokenString == "" {
 			var err error
 			tokenString, err = c.Cookie("Authorization")
@@ -24,7 +22,6 @@ func UserAuthMiddleware() gin.HandlerFunc {
 		}
 		userID, userEmail, err := helper.ExtractUserIDFromToken(tokenString)
 		if err != nil {
-			fmt.Println("error is 👺 ", err)
 			response := response.ClientResponse(http.StatusUnauthorized, "Invalid Token ", nil, err.Error())
 			c.JSON(http.StatusUnauthorized, response)
 			c.AbortWithStatus(http.StatusUnauthorized)

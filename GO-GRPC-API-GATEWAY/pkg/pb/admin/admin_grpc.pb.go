@@ -19,13 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Admin_AdminLogin_FullMethodName = "/admin.Admin/AdminLogin"
+	Admin_AdminSignup_FullMethodName = "/admin.Admin/AdminSignup"
+	Admin_AdminLogin_FullMethodName  = "/admin.Admin/AdminLogin"
 )
 
 // AdminClient is the client API for Admin service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
+	AdminSignup(ctx context.Context, in *AdminSignupRequest, opts ...grpc.CallOption) (*AdminSignupResponse, error)
 	AdminLogin(ctx context.Context, in *AdminLoginInRequest, opts ...grpc.CallOption) (*AdminLoginResponse, error)
 }
 
@@ -35,6 +37,15 @@ type adminClient struct {
 
 func NewAdminClient(cc grpc.ClientConnInterface) AdminClient {
 	return &adminClient{cc}
+}
+
+func (c *adminClient) AdminSignup(ctx context.Context, in *AdminSignupRequest, opts ...grpc.CallOption) (*AdminSignupResponse, error) {
+	out := new(AdminSignupResponse)
+	err := c.cc.Invoke(ctx, Admin_AdminSignup_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *adminClient) AdminLogin(ctx context.Context, in *AdminLoginInRequest, opts ...grpc.CallOption) (*AdminLoginResponse, error) {
@@ -50,6 +61,7 @@ func (c *adminClient) AdminLogin(ctx context.Context, in *AdminLoginInRequest, o
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
 type AdminServer interface {
+	AdminSignup(context.Context, *AdminSignupRequest) (*AdminSignupResponse, error)
 	AdminLogin(context.Context, *AdminLoginInRequest) (*AdminLoginResponse, error)
 	mustEmbedUnimplementedAdminServer()
 }
@@ -58,6 +70,9 @@ type AdminServer interface {
 type UnimplementedAdminServer struct {
 }
 
+func (UnimplementedAdminServer) AdminSignup(context.Context, *AdminSignupRequest) (*AdminSignupResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AdminSignup not implemented")
+}
 func (UnimplementedAdminServer) AdminLogin(context.Context, *AdminLoginInRequest) (*AdminLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AdminLogin not implemented")
 }
@@ -72,6 +87,24 @@ type UnsafeAdminServer interface {
 
 func RegisterAdminServer(s grpc.ServiceRegistrar, srv AdminServer) {
 	s.RegisterService(&Admin_ServiceDesc, srv)
+}
+
+func _Admin_AdminSignup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminSignupRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServer).AdminSignup(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Admin_AdminSignup_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServer).AdminSignup(ctx, req.(*AdminSignupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Admin_AdminLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -99,6 +132,10 @@ var Admin_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "admin.Admin",
 	HandlerType: (*AdminServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AdminSignup",
+			Handler:    _Admin_AdminSignup_Handler,
+		},
 		{
 			MethodName: "AdminLogin",
 			Handler:    _Admin_AdminLogin_Handler,

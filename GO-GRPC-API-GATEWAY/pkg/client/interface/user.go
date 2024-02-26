@@ -4,5 +4,5 @@ import "grpc-api-gateway/pkg/utils/models"
 
 type UserClient interface {
 	UsersSignUp(user models.UserSignUp) (models.TokenUser, error)
-	UsersLogin(user models.UserLogin) (models.TokenUser, error)
+	UserLogin(user models.UserLogin) (models.TokenUser, error)
 }

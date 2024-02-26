@@ -53,7 +53,7 @@ func (ur *UserHandler) Userlogin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, errs)
 		return
 	}
-	user, err := ur.GRPC_Client.UsersLogin(UserLoginDetail)
+	user, err := ur.GRPC_Client.UserLogin(UserLoginDetail)
 	if err != nil {
 		errs := response.ClientResponse(http.StatusBadRequest, "fields provided are in wrong format", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errs)
