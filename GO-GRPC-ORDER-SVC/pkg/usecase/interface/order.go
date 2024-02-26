@@ -7,5 +7,5 @@ import (
 
 type OrderUseCase interface {
 	OrderItemsFromCart(orderFromCart models.OrderFromCart, userID int) (domain.OrderSuccessResponse, error)
-	GetOrderDetails(userId int, page int, count int)
+	GetOrderDetails(userId int, page int, count int) ([]models.FullOrderDetails, error)
 }

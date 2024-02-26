@@ -2,8 +2,11 @@ package usecase
 
 import (
 	"errors"
+	
 	"order/service/pkg/domain"
-	interfaces "order/service/pkg/usecase/interface"
+	clienterface "order/service/pkg/client/interface"
+	interfaces "order/service/pkg/repository/interface"
+	services "order/service/pkg/usecase/interface"
 	"order/service/pkg/util/models"
 
 	"github.com/jinzhu/copier"
@@ -11,10 +14,10 @@ import (
 
 type orderUseCase struct {
 	orderRepository interfaces.OrderRepository
-	cartRepository  interfaces.CartRepository
+	cartRepository  clienterface.CartClient
 }
 
-func NewOrderUseCase(repository interfaces.OrderRepository, cartRepo interfaces.CartRepository) services.OrderUseCase {
+func NewOrderUseCase(repository interfaces.OrderRepository, cartRepo clienterface.CartClient) services.OrderUseCase {
 	return &orderUseCase{
 		orderRepository: repository,
 		cartRepository:  cartRepo,

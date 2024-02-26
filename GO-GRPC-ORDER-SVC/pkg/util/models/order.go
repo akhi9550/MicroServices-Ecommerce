@@ -64,6 +64,7 @@ type OrderResponse struct {
 
 type OrderFromCart struct {
 	AddressID uint `json:"address_id" binding:"required"`
+	PaymentID uint `json:"payment_id" binding:"required"`
 }
 
 type OrderIncoming struct {

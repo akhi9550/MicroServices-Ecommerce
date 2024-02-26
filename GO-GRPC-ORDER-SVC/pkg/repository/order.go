@@ -2,7 +2,10 @@ package repository
 
 import (
 	"order/service/pkg/domain"
+	interfaces "order/service/pkg/repository/interface"
 	"order/service/pkg/util/models"
+
+	"gorm.io/gorm"
 )
 
 type orderRepository struct {

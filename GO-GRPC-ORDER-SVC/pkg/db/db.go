@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"order/service/pkg/config"
 	"order/service/pkg/domain"
 
 	"gorm.io/driver/postgres"

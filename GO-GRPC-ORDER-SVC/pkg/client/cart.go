@@ -1,41 +1,52 @@
 package client
 
 import (
-	"errors"
+	"context"
+	"fmt"
+	clienterface "order/service/pkg/client/interface"
+	"order/service/pkg/config"
+	pb "order/service/pkg/pb/cart"
 	"order/service/pkg/util/models"
 
-	"gorm.io/gorm"
+	"google.golang.org/grpc"
 )
 
-type cartRepository struct {
-	DB *gorm.DB
+type cartClient struct {
+	Client pb.CartClient
 }
 
-func NewCartRepository(DB *gorm.DB) interfaces.CartRepository {
-	return &cartRepository{
-		DB: DB,
+func NewCartClient(cfg config.Config) clienterface.CartClient {
+
+	grpcConnection, err := grpc.Dial(cfg.CartSvcUrl, grpc.WithInsecure())
+	if err != nil {
+		fmt.Println("Could not connect", err)
 	}
+
+	grpcClient := pb.NewCartClient(grpcConnection)
+
+	return &cartClient{
+		Client: grpcClient,
+	}
+
 }
 
-func (cr *cartRepository) GetAllItemsFromCart(userID int) ([]models.Cart, error) {
-	var count int
-	var cartResponse []models.Cart
-	err := cr.DB.Raw("SELECT COUNT(*) FROM carts WHERE user_id = ?", userID).Scan(&count).Error
+func (c *cartClient) GetAllItemsFromCart(userID int) ([]models.Cart, error) {
+	res, err := c.Client.GetCart(context.Background(), &pb.GetCartRequest{
+		UserID: int64(userID),
+	})
 	if err != nil {
 		return []models.Cart{}, err
 	}
-	if count == 0 {
-		return []models.Cart{}, nil
+	var result []models.Cart
+
+	for _, v := range res.Cart {
+		result = append(result, models.Cart{
+			ProductID:   uint(v.ProductID),
+			ProductName: v.ProductName,
+			Quantity:    float64(v.Quantity),
+			TotalPrice:  float64(v.TotalPrice),
+		})
 	}
-	err = cr.DB.Raw("SELECT carts.user_id,users.firstname as user_name,carts.product_id,products.name as product_name,carts.quantity,carts.total_price from carts INNER JOIN users on carts.user_id = users.id INNER JOIN products ON carts.product_id = products.id where user_id = ?", userID).First(&cartResponse).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			if len(cartResponse) == 0 {
-				return []models.Cart{}, nil
-			}
-			return []models.Cart{}, err
-		}
-		return []models.Cart{}, err
-	}
-	return cartResponse, nil
+	fmt.Println(result)
+	return result, nil
 }
