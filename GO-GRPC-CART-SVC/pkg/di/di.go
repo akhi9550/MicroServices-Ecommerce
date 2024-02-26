@@ -1,13 +1,13 @@
 package di
 
 import (
-	server "cart/pkg/api"
-	"cart/pkg/api/service"
-	client "cart/pkg/client"
-	"cart/pkg/config"
-	"cart/pkg/db"
-	"cart/pkg/repository"
-	"cart/pkg/usecase"
+	server "cart/service/pkg/api"
+	"cart/service/pkg/api/service"
+	"cart/service/pkg/client"
+	"cart/service/pkg/config"
+	"cart/service/pkg/db"
+	"cart/service/pkg/repository"
+	"cart/service/pkg/usecase"
 )
 
 func InitializeAPI(cfg config.Config) (*server.Server, error) {
@@ -19,7 +19,8 @@ func InitializeAPI(cfg config.Config) (*server.Server, error) {
 
 	cartRepository := repository.NewCartRepository(gormDB)
 	productClient := client.NewProductClient(&cfg)
-	adminUseCase := usecase.NewCartUseCase(cartRepository, productClient)
+	orderClient := client.NewOrderClient(&cfg)
+	adminUseCase := usecase.NewCartUseCase(cartRepository, productClient,orderClient)
 
 	adminServiceServer := service.NewCartServer(adminUseCase)
 	grpcServer, err := server.NewGRPCServer(cfg, adminServiceServer)

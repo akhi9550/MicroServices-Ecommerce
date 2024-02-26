@@ -1,5 +1,5 @@
 package interfaces
-type OrderClient interface{
-	ProductStockMinus(productID, stock int) error
 
+type NewOrderClient interface {
+	ProductStockMinus(productID, stock int) error
 }

@@ -1,18 +1,20 @@
 package usecase
 
 import (
+	clinetinterface "cart/service/pkg/client/interface"
 	interfaces "cart/service/pkg/repository/interface"
+	services "cart/service/pkg/usecase/interface"
 	"cart/service/pkg/utils/models"
 	"errors"
 )
 
 type cartUseCase struct {
 	cartRepository    interfaces.CartRepository
-	productRepository interfaces.ProductRepository
-	orderRepository   interfaces.OrderRepository
+	productRepository clinetinterface.NewProductClient
+	orderRepository   clinetinterface.NewOrderClient
 }
 
-func NewCartUseCase(repository interfaces.CartRepository, productRepo interfaces.ProductRepository, orderRepo interfaces.OrderRepository) services.CartUseCase {
+func NewCartUseCase(repository interfaces.CartRepository, productRepo clinetinterface.NewProductClient, orderRepo clinetinterface.NewOrderClient) services.CartUseCase {
 
 	return &cartUseCase{
 		cartRepository:    repository,

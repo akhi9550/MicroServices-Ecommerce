@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package cart;
 
-option go_package = "./pkg/pb";
+option go_package = "./pkg/pb/cart";
 
 service Cart {
   rpc AddToCart(AddToCartRequest) returns (AddToCartResponse) {};

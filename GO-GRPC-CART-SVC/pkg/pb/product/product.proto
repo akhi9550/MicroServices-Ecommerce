@@ -84,6 +84,6 @@ message GetPriceofProductFromIDRequest{
     int64 ID=1;
 }
 message GetPriceofProductFromIDResponse{
-    int64 Quantity=1;
+    int64 Price=1;
     string Error=2;
 }
