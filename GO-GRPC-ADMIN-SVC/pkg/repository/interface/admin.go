@@ -6,5 +6,7 @@ import (
 )
 
 type AdminRepository interface {
-	LoginHandler(adminDetails models.AdminLogin) (domain.Admin, error)
+	AdminSignUp(adminDetails models.AdminSignUp) (models.AdminDetailsResponse, error)
+	FindAdminByEmail(admin models.AdminLogin) (models.AdminSignUp, error)
+	CheckAdminExistsByEmail(email string) (*domain.Admin, error)
 }

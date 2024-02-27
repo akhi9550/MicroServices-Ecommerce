@@ -6,5 +6,6 @@ import (
 )
 
 type AdminUseCase interface {
-	LoginHandler(adminDetails models.AdminLogin) (domain.TokenAdmin, error)
+	AdminSignUp(admindeatils models.AdminSignUp) (*domain.TokenAdmin, error)
+	LoginHandler(adminDetails models.AdminLogin) (*domain.TokenAdmin, error)
 }

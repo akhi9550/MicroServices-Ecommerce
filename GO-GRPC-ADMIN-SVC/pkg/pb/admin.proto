@@ -5,7 +5,20 @@ package admin;
 option go_package = "./pkg/pb";
 
 service Admin{
+    rpc AdminSignup(AdminSignupRequest) returns(AdminSignupResponse){};
     rpc AdminLogin(AdminLoginInRequest) returns (AdminLoginResponse){};
+}
+message AdminSignupRequest{
+    string firstname=1;
+    string lastname=2;
+    string email=3;
+    string password=4;
+}
+
+message AdminSignupResponse{
+    int64 status=1;
+    AdminDetails adminDetails=2;
+    string token=3;
 }
 
 message AdminDetails{
@@ -22,5 +35,4 @@ message AdminLoginResponse{
     int64 status=1;
     AdminDetails adminDetails=2;
     string token=3;
-    string error=4;
 }
