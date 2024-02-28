@@ -61,7 +61,7 @@ func (pr *productUseCase) UpdateProduct(pid int, stock int) (models.ProductUpdat
 	if stock <= 0 {
 		return models.ProductUpdateReciever{}, errors.New("stock doesnot update invalid input")
 	}
-	result, err := pr.productRepository.CheckProductExist(pid)
+	result, err := pr.productRepository.CheckProduct(pid)
 	if err != nil {
 		return models.ProductUpdateReciever{}, err
 	}
@@ -74,4 +74,36 @@ func (pr *productUseCase) UpdateProduct(pid int, stock int) (models.ProductUpdat
 	}
 	return newcat, err
 
+}
+func (pr *productUseCase) GetQuantityFromProductID(id int) (int, error) {
+	data, err := pr.productRepository.GetQuantityFromProductID(id)
+	if err != nil {
+		return 0, err
+	}
+	return data, nil
+}
+func (pr *productUseCase) GetPriceOfProductFromID(prodcut_id int) (float64, error) {
+	data, err := pr.productRepository.GetPriceOfProductFromID(prodcut_id)
+	if err != nil {
+		return 0.0, err
+	}
+	return data, nil
+}
+
+func (pr *productUseCase) ProductStockMinus(productID, stock int) error {
+	err := pr.productRepository.ProductStockMinus(productID, stock)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (pr *productUseCase) CheckProduct(product_id int) (bool, error) {
+	ok, err := pr.productRepository.CheckProduct(product_id)
+	if err != nil {
+		return false, err
+	}
+	if !ok {
+		return false, err
+	}
+	return true, nil
 }

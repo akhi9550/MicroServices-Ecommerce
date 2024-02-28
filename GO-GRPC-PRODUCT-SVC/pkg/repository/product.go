@@ -79,12 +79,9 @@ func (pr *productRepository) DeleteProducts(product_id int) error {
 	if err := pr.DB.Exec("DELETE FROM products WHERE id=?", product_id).Error; err != nil {
 		return err
 	}
-	if err := pr.DB.Exec("DELETE FROM images WHERE product_id = ?", product_id).Error; err != nil {
-		return err
-	}
 	return nil
 }
-func (pr *productRepository) CheckProductExist(pid int) (bool, error) {
+func (pr *productRepository) CheckProduct(pid int) (bool, error) {
 	var a int
 	err := pr.DB.Raw("SELECT COUNT(*) FROM products WHERE id=?", pid).Scan(&a).Error
 	if err != nil {
@@ -113,4 +110,28 @@ func (pr *productRepository) UpdateProduct(pid int, stock int) (models.ProductUp
 	newdetails.ProductID = pid
 	newdetails.Stock = newQuantity
 	return newdetails, nil
+}
+func (pr *productRepository) GetQuantityFromProductID(id int) (int, error) {
+	var quantity int
+	err := pr.DB.Raw("SELECT stock FROM products WHERE id= ?", id).Scan(&quantity).Error
+	if err != nil {
+		return 0.0, err
+	}
+
+	return quantity, nil
+}
+func (pr *productRepository) GetPriceOfProductFromID(prodcut_id int) (float64, error) {
+	var productPrice float64
+
+	if err := pr.DB.Raw("SELECT price FROM products WHERE id = ?", prodcut_id).Scan(&productPrice).Error; err != nil {
+		return 0.0, err
+	}
+	return productPrice, nil
+}
+func (pr *productRepository) ProductStockMinus(productID, stock int) error {
+	err := pr.DB.Exec("UPDATE products SET stock = stock - ? WHERE id = ?", stock, productID).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
