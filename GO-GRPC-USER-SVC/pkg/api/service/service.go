@@ -33,12 +33,35 @@ func (a *UserServer) UserSignUp(ctx context.Context, userSignUpDetails *pb.UserS
 	if err != nil {
 		return &pb.UserSignUpResponse{}, err
 	}
-	userDetails := &pb.UserDetails{Id: uint64(data.User.ID), Firstname: data.User.Firstname, Lastname: data.User.Firstname, Email: data.User.Email, Phone: data.User.Phone}
+	userDetails := &pb.UserDetails{Id: uint64(data.User.ID), Firstname: data.User.Firstname, Lastname: data.User.Lastname, Email: data.User.Email, Phone: data.User.Phone}
 	return &pb.UserSignUpResponse{
-		Status:       200,
+		Status:       201,
 		UserDetails:  userDetails,
 		AccessToken:  data.AccessToken,
 		RefreshToken: data.RefreshToken,
 	}, nil
 
+}
+func (a *UserServer) UserLogin(ctx context.Context, loginDeatails *pb.UserLoginRequest) (*pb.UserLoginResponse, error) {
+	login := models.UserLogin{
+		Email:    loginDeatails.Email,
+		Password: loginDeatails.Password,
+	}
+	data, err := a.userUseCase.UsersLogin(login)
+	if err != nil {
+		return &pb.UserLoginResponse{}, err
+	}
+	userDetails := &pb.UserDetails{
+		Id:        uint64(data.User.ID),
+		Firstname: data.User.Firstname,
+		Lastname:  data.User.Lastname,
+		Email:     data.User.Email,
+		Phone:     data.User.Phone,
+	}
+	return &pb.UserLoginResponse{
+		Status:       201,
+		UserDetails:  userDetails,
+		AccessToken:  data.AccessToken,
+		RefreshToken: data.RefreshToken,
+	}, nil
 }
