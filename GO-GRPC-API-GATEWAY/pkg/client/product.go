@@ -81,7 +81,7 @@ func (c *productClient) AddProducts(product models.Product) (models.Products, er
 		Price:       float64(res.Price),
 	}, nil
 }
-func (c *productClient) DeleteProducts(id int) error {
+func (c *productClient) DeleteProduct(id int) error {
 	res, err := c.Client.DeleteProduct(context.Background(), &pb.DeleteProductRequest{
 		ID: int64(id),
 	})
@@ -93,7 +93,7 @@ func (c *productClient) DeleteProducts(id int) error {
 	}
 	return nil
 }
-func (c *productClient) UpdateProduct(pid int, stock int) (models.ProductUpdateReciever, error) {
+func (c *productClient) UpdateProducts(pid int, stock int) (models.ProductUpdateReciever, error) {
 	res, err := c.Client.UpdateProducts(context.Background(), &pb.UpdateProductRequest{
 		ID:    int64(pid),
 		Stock: int64(stock),

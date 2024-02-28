@@ -30,10 +30,11 @@ func NewCartClient(cfg config.Config) interfaces.CartClient {
 	}
 
 }
-func (c *cartClient) AddToCart(product_id int, user_id int) (models.CartResponse, error) {
+func (c *cartClient) AddToCart(product_id int, user_id int, quantity int) (models.CartResponse, error) {
 	res, err := c.Client.AddToCart(context.Background(), &pb.AddToCartRequest{
 		ProductID: int64(product_id),
 		UserID:    int64(user_id),
+		Quantity:  int64(quantity),
 	})
 	if err != nil {
 		return models.CartResponse{}, err
@@ -41,19 +42,22 @@ func (c *cartClient) AddToCart(product_id int, user_id int) (models.CartResponse
 	if res.Error != "" {
 		return models.CartResponse{}, errors.New(res.Error)
 	}
-	cart := models.Cart{
-		ProductID:   uint(res.Cart.ProductID),
-		ProductName: res.Cart.ProductName,
-		Quantity:    float64(res.Cart.Quantity),
-		TotalPrice:  float64(res.Cart.TotalPrice),
+	var carts []models.Cart
+	for _, cartDetails := range res.Cart {
+		cart := models.Cart{
+			ProductID:  uint(cartDetails.ProductID),
+			Quantity:   float64(cartDetails.Quantity),
+			TotalPrice: float64(cartDetails.TotalPrice),
+		}
+		carts = append(carts, cart)
 	}
+
 	return models.CartResponse{
-		UserName:   res.Username,
 		TotalPrice: float64(res.Price),
-		Cart:       []models.Cart{cart},
+		Cart:       carts,
 	}, nil
 }
-func (c *cartClient) DisplayCart(user_id int) (models.CartResponse, error) {
+func (c *cartClient) GetCart(user_id int) (models.CartResponse, error) {
 	res, err := c.Client.GetCart(context.Background(), &pb.GetCartRequest{
 		UserID: int64(user_id),
 	})
@@ -63,15 +67,18 @@ func (c *cartClient) DisplayCart(user_id int) (models.CartResponse, error) {
 	if res.Error != "" {
 		return models.CartResponse{}, errors.New(res.Error)
 	}
-	cart := models.Cart{
-		ProductID:   uint(res.Cart.ProductID),
-		ProductName: res.Cart.ProductName,
-		Quantity:    float64(res.Cart.Quantity),
-		TotalPrice:  float64(res.Cart.TotalPrice),
+	var carts []models.Cart
+	for _, cartDetails := range res.Cart {
+		cart := models.Cart{
+			ProductID:  uint(cartDetails.ProductID),
+			Quantity:   float64(cartDetails.Quantity),
+			TotalPrice: float64(cartDetails.TotalPrice),
+		}
+		carts = append(carts, cart)
 	}
+
 	return models.CartResponse{
-		UserName:   res.Username,
 		TotalPrice: float64(res.Price),
-		Cart:       []models.Cart{cart},
+		Cart:       carts,
 	}, nil
 }

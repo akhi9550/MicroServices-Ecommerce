@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	interfaces "grpc-api-gateway/pkg/client/interface"
 	"grpc-api-gateway/pkg/config"
@@ -38,7 +37,6 @@ func (ad *adminClient) AdminSignUp(admindeatils models.AdminSignUp) (models.Toke
 		Password:  admindeatils.Password,
 	})
 	if err != nil {
-		fmt.Println("🤣")
 		return models.TokenAdmin{}, err
 	}
 	return models.TokenAdmin{
@@ -60,9 +58,6 @@ func (ad *adminClient) AdminLogin(adminDetails models.AdminLogin) (models.TokenA
 
 	if err != nil {
 		return models.TokenAdmin{}, err
-	}
-	if admin.Error != "" {
-		return models.TokenAdmin{}, errors.New(admin.Error)
 	}
 	return models.TokenAdmin{
 		Admin: models.AdminDetailsResponse{

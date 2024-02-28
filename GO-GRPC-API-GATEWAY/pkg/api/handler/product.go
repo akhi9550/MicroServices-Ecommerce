@@ -73,9 +73,10 @@ func (pt *ProductHandler) ShowAllProducts(c *gin.Context) {
 	success := response.ClientResponse(http.StatusOK, "Successfully Retrieved all products", products, nil)
 	c.JSON(http.StatusOK, success)
 }
-func (pt *ProductHandler) DeleteProducts(c *gin.Context) {
-	var id int
-	err := pt.GRPC_Client.DeleteProducts(id)
+func (pt *ProductHandler) DeleteProduct(c *gin.Context) {
+	Id := c.Query("id")
+	id, _ := strconv.Atoi(Id)
+	err := pt.GRPC_Client.DeleteProduct(id)
 	if err != nil {
 		errs := response.ClientResponse(http.StatusBadRequest, "Could not delete the specified products", nil, err.Error())
 		c.JSON(http.StatusInternalServerError, errs)
@@ -85,7 +86,7 @@ func (pt *ProductHandler) DeleteProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, success)
 }
 
-func (pt *ProductHandler) UpdateProduct(c *gin.Context) {
+func (pt *ProductHandler) UpdateProducts(c *gin.Context) {
 	var p models.ProductUpdate
 	if err := c.BindJSON(&p); err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "Fields provided are in wrong format", nil, err.Error())
@@ -93,7 +94,7 @@ func (pt *ProductHandler) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	a, err := pt.GRPC_Client.UpdateProduct(p.ProductId, p.Stock)
+	a, err := pt.GRPC_Client.UpdateProducts(p.ProductId, p.Stock)
 	if err != nil {
 		errorRes := response.ClientResponse(http.StatusBadRequest, "Could not update the product quantity", nil, err.Error())
 		c.JSON(http.StatusBadRequest, errorRes)

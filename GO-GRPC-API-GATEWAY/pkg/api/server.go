@@ -2,6 +2,7 @@ package server
 
 import (
 	"grpc-api-gateway/pkg/api/handler"
+	"grpc-api-gateway/pkg/api/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -16,28 +17,28 @@ func NewServerHTTP(adminHandler *handler.AdminHandler, productHandler *handler.P
 
 	router.Use(gin.Logger())
 
-	//admin side
 	router.POST("/admin/login", adminHandler.LoginHandler)
-	router.POST("/admin/signup",adminHandler.AdminSignUp)
+	router.POST("/admin/signup", adminHandler.AdminSignUp)
 
-	//user side
 	router.POST("/user/signup", userHandler.UserSignup)
 	router.POST("/user/login", userHandler.Userlogin)
 
-	//product side
-	router.GET("/user/home", productHandler.ShowAllProducts)
-	router.POST("/admin/product/add", productHandler.AddProducts)
-	router.DELETE("/admin/product/delete", productHandler.DeleteProducts)
-	router.PUT("/admin/product/update", productHandler.UpdateProduct)
+	router.GET("/product", productHandler.ShowAllProducts)
 
-	//cart side
-	router.POST("/user/cart", cartHandler.AddToCart)
-	router.GET("/user/cart", cartHandler.GetCart)
+	router.Use(middleware.AdminAuthMiddleware())
+	{
+		router.POST("/product", productHandler.AddProducts)
+		router.DELETE("/product", productHandler.DeleteProduct)
+		router.PUT("/product", productHandler.UpdateProducts)
+	}
+	router.Use(middleware.UserAuthMiddleware())
+	{
+		router.POST("/cart", cartHandler.AddToCart)
+		router.GET("/cart", cartHandler.GetCart)
 
-	//order
-	router.POST("user/cart/order", orderhandler.OrderItemsFromCart)
-	router.GET("user/orders", orderhandler.GetOrderDetails)
-
+		router.POST("/order", orderhandler.OrderItemsFromCart)
+		router.GET("/order", orderhandler.GetOrderDetails)
+	}
 	return &ServerHTTP{engine: router}
 }
 

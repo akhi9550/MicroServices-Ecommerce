@@ -72,10 +72,9 @@ func (c *orderClient) GetOrderDetails(userId int, page int, count int) ([]models
 		var orderProductDetails []models.OrderProductDetails
 		for _, product := range v.OrderProductDetails {
 			orderProduct := models.OrderProductDetails{
-				ProductID:   uint(product.ProductID),
-				ProductName: product.ProductName,
-				Quantity:    int(product.Quantity),
-				TotalPrice:  float64(product.Price),
+				ProductID:  uint(product.ProductID),
+				Quantity:   int(product.Quantity),
+				TotalPrice: float64(product.Price),
 			}
 			orderProductDetails = append(orderProductDetails, orderProduct)
 		}
@@ -85,6 +84,5 @@ func (c *orderClient) GetOrderDetails(userId int, page int, count int) ([]models
 		}
 		result = append(result, fullOrderDetails)
 	}
-
 	return result, nil
 }
