@@ -11,20 +11,18 @@ import (
 type cartUseCase struct {
 	cartRepository    interfaces.CartRepository
 	productRepository clinetinterface.NewProductClient
-	orderRepository   clinetinterface.NewOrderClient
 }
 
-func NewCartUseCase(repository interfaces.CartRepository, productRepo clinetinterface.NewProductClient, orderRepo clinetinterface.NewOrderClient) services.CartUseCase {
+func NewCartUseCase(repository interfaces.CartRepository, productRepo clinetinterface.NewProductClient) services.CartUseCase {
 
 	return &cartUseCase{
 		cartRepository:    repository,
 		productRepository: productRepo,
-		orderRepository:   orderRepo,
 	}
 
 }
-func (cr *cartUseCase) AddToCart(product_id int, user_id int) (models.CartResponse, error) {
-	ok, _, err := cr.cartRepository.CheckProduct(product_id)
+func (cr *cartUseCase) AddToCart(product_id, user_id, quantity int) (models.CartResponse, error) {
+	ok, err := cr.productRepository.CheckProduct(product_id)
 	if err != nil {
 		return models.CartResponse{}, err
 	}
@@ -47,15 +45,25 @@ func (cr *cartUseCase) AddToCart(product_id int, user_id int) (models.CartRespon
 	if quantityOfProduct == QuantityOfProductInCart {
 		return models.CartResponse{}, errors.New("stock limit exceeded")
 	}
-	productPrice, err := cr.productRepository.GetPriceOfProductFromID(product_id)
+	ok, err = cr.cartRepository.ProductExist(user_id, product_id)
+	if err != nil {
+		return models.CartResponse{}, err
+	}
+	if !ok {
+		return models.CartResponse{}, err
+	}
+	productPrice, err := cr.productRepository.GetPriceofProductFromID(product_id)
 	if err != nil {
 
 		return models.CartResponse{}, err
 	}
+	if !ok {
+		return models.CartResponse{}, err
+	}
 
-	FinalPrice := productPrice
+	FinalPrice := productPrice * float64(quantity)
 	if QuantityOfProductInCart == 0 {
-		err := cr.cartRepository.AddItemIntoCart(user_id, product_id, 1, FinalPrice)
+		err := cr.cartRepository.AddItemIntoCart(user_id, product_id, quantity, FinalPrice)
 		if err != nil {
 
 			return models.CartResponse{}, err
@@ -66,7 +74,7 @@ func (cr *cartUseCase) AddToCart(product_id int, user_id int) (models.CartRespon
 		if err != nil {
 			return models.CartResponse{}, err
 		}
-		err = cr.cartRepository.UpdateCart(QuantityOfProductInCart+1, currentTotal+productPrice, user_id, product_id)
+		err = cr.cartRepository.UpdateCart(QuantityOfProductInCart+quantity, currentTotal+productPrice, user_id, product_id)
 		if err != nil {
 			return models.CartResponse{}, err
 		}
@@ -80,12 +88,11 @@ func (cr *cartUseCase) AddToCart(product_id int, user_id int) (models.CartRespon
 
 		return models.CartResponse{}, err
 	}
-	err = cr.orderRepository.ProductStockMinus(product_id, QuantityOfProductInCart)
+	err = cr.productRepository.ProductStockMinus(product_id, QuantityOfProductInCart)
 	if err != nil {
 		return models.CartResponse{}, err
 	}
 	return models.CartResponse{
-		UserName:   cartTotal.UserName,
 		TotalPrice: cartTotal.TotalPrice,
 		Cart:       cartDetails,
 	}, nil
@@ -101,8 +108,36 @@ func (cr *cartUseCase) DisplayCart(user_id int) (models.CartResponse, error) {
 		return models.CartResponse{}, err
 	}
 	return models.CartResponse{
-		UserName:   cartTotal.UserName,
 		TotalPrice: cartTotal.TotalPrice,
 		Cart:       cart,
 	}, nil
+}
+
+func (cr *cartUseCase) GetAllItemsFromCart(userID int) ([]models.Cart, error) {
+	res, err := cr.cartRepository.GetAllItemsFromCart(userID)
+	if err != nil {
+		return []models.Cart{}, err
+	}
+	return res, nil
+}
+func (cr *cartUseCase) DoesCartExist(userID int) (bool, error) {
+	res, err := cr.cartRepository.DoesCartExist(userID)
+	if err != nil {
+		return false, err
+	}
+	return res, nil
+}
+func (cr *cartUseCase) TotalAmountInCart(userID int) (float64, error) {
+	res, err := cr.cartRepository.TotalAmountInCart(userID)
+	if err != nil {
+		return 0.0, err
+	}
+	return res, nil
+}
+func (cr *cartUseCase) UpdateCartAfterOrder(userID, productID int, quantity float64) error {
+	err := cr.cartRepository.UpdateCartAfterOrder(userID, productID, quantity)
+	if err != nil {
+		return err
+	}
+	return nil
 }

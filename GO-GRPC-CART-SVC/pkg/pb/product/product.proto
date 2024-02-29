@@ -11,8 +11,18 @@ service Product{
     rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {};
     rpc GetQuantityFromProductID(GetQuantityFromProductIDRequest)returns(GetQuantityFromProductIDResponse){};
     rpc GetPriceofProductFromID(GetPriceofProductFromIDRequest)returns(GetPriceofProductFromIDResponse){};
+    rpc ProductStockMinus(ProductStockMinusRequest) returns(ProductStockMinusReponse){};
+    rpc CheckProduct(CheckProductRequest) returns (CheckProductResponse){};
+
 }
 
+message CheckProductRequest{
+    int64 ProductID=1;
+}
+message CheckProductResponse{
+    bool bool=1;
+    string Error=2;
+}
 message AddProductRequest{
     string Name=1;
     string Description=2;
@@ -86,4 +96,12 @@ message GetPriceofProductFromIDRequest{
 message GetPriceofProductFromIDResponse{
     int64 Price=1;
     string Error=2;
+}
+
+message ProductStockMinusRequest{
+    int64 ID=1;
+    int64 stock=2;
+}
+message ProductStockMinusReponse{
+    string Error=1;
 }

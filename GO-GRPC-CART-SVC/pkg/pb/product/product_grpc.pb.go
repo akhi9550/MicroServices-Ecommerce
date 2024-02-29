@@ -25,6 +25,8 @@ const (
 	Product_DeleteProduct_FullMethodName            = "/product.Product/DeleteProduct"
 	Product_GetQuantityFromProductID_FullMethodName = "/product.Product/GetQuantityFromProductID"
 	Product_GetPriceofProductFromID_FullMethodName  = "/product.Product/GetPriceofProductFromID"
+	Product_ProductStockMinus_FullMethodName        = "/product.Product/ProductStockMinus"
+	Product_CheckProduct_FullMethodName             = "/product.Product/CheckProduct"
 )
 
 // ProductClient is the client API for Product service.
@@ -37,6 +39,8 @@ type ProductClient interface {
 	DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...grpc.CallOption) (*DeleteProductResponse, error)
 	GetQuantityFromProductID(ctx context.Context, in *GetQuantityFromProductIDRequest, opts ...grpc.CallOption) (*GetQuantityFromProductIDResponse, error)
 	GetPriceofProductFromID(ctx context.Context, in *GetPriceofProductFromIDRequest, opts ...grpc.CallOption) (*GetPriceofProductFromIDResponse, error)
+	ProductStockMinus(ctx context.Context, in *ProductStockMinusRequest, opts ...grpc.CallOption) (*ProductStockMinusReponse, error)
+	CheckProduct(ctx context.Context, in *CheckProductRequest, opts ...grpc.CallOption) (*CheckProductResponse, error)
 }
 
 type productClient struct {
@@ -101,6 +105,24 @@ func (c *productClient) GetPriceofProductFromID(ctx context.Context, in *GetPric
 	return out, nil
 }
 
+func (c *productClient) ProductStockMinus(ctx context.Context, in *ProductStockMinusRequest, opts ...grpc.CallOption) (*ProductStockMinusReponse, error) {
+	out := new(ProductStockMinusReponse)
+	err := c.cc.Invoke(ctx, Product_ProductStockMinus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productClient) CheckProduct(ctx context.Context, in *CheckProductRequest, opts ...grpc.CallOption) (*CheckProductResponse, error) {
+	out := new(CheckProductResponse)
+	err := c.cc.Invoke(ctx, Product_CheckProduct_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProductServer is the server API for Product service.
 // All implementations must embed UnimplementedProductServer
 // for forward compatibility
@@ -111,6 +133,8 @@ type ProductServer interface {
 	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductResponse, error)
 	GetQuantityFromProductID(context.Context, *GetQuantityFromProductIDRequest) (*GetQuantityFromProductIDResponse, error)
 	GetPriceofProductFromID(context.Context, *GetPriceofProductFromIDRequest) (*GetPriceofProductFromIDResponse, error)
+	ProductStockMinus(context.Context, *ProductStockMinusRequest) (*ProductStockMinusReponse, error)
+	CheckProduct(context.Context, *CheckProductRequest) (*CheckProductResponse, error)
 	mustEmbedUnimplementedProductServer()
 }
 
@@ -135,6 +159,12 @@ func (UnimplementedProductServer) GetQuantityFromProductID(context.Context, *Get
 }
 func (UnimplementedProductServer) GetPriceofProductFromID(context.Context, *GetPriceofProductFromIDRequest) (*GetPriceofProductFromIDResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetPriceofProductFromID not implemented")
+}
+func (UnimplementedProductServer) ProductStockMinus(context.Context, *ProductStockMinusRequest) (*ProductStockMinusReponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ProductStockMinus not implemented")
+}
+func (UnimplementedProductServer) CheckProduct(context.Context, *CheckProductRequest) (*CheckProductResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckProduct not implemented")
 }
 func (UnimplementedProductServer) mustEmbedUnimplementedProductServer() {}
 
@@ -257,6 +287,42 @@ func _Product_GetPriceofProductFromID_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Product_ProductStockMinus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProductStockMinusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServer).ProductStockMinus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Product_ProductStockMinus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServer).ProductStockMinus(ctx, req.(*ProductStockMinusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Product_CheckProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductServer).CheckProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Product_CheckProduct_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductServer).CheckProduct(ctx, req.(*CheckProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Product_ServiceDesc is the grpc.ServiceDesc for Product service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -287,6 +353,14 @@ var Product_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetPriceofProductFromID",
 			Handler:    _Product_GetPriceofProductFromID_Handler,
+		},
+		{
+			MethodName: "ProductStockMinus",
+			Handler:    _Product_ProductStockMinus_Handler,
+		},
+		{
+			MethodName: "CheckProduct",
+			Handler:    _Product_CheckProduct_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

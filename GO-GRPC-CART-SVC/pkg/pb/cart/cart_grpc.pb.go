@@ -19,8 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Cart_AddToCart_FullMethodName = "/cart.Cart/AddToCart"
-	Cart_GetCart_FullMethodName   = "/cart.Cart/GetCart"
+	Cart_AddToCart_FullMethodName            = "/cart.Cart/AddToCart"
+	Cart_GetCart_FullMethodName              = "/cart.Cart/GetCart"
+	Cart_GetAllItemsFromCart_FullMethodName  = "/cart.Cart/GetAllItemsFromCart"
+	Cart_DoesCartExist_FullMethodName        = "/cart.Cart/DoesCartExist"
+	Cart_TotalAmountInCart_FullMethodName    = "/cart.Cart/TotalAmountInCart"
+	Cart_UpdateCartAfterOrder_FullMethodName = "/cart.Cart/UpdateCartAfterOrder"
 )
 
 // CartClient is the client API for Cart service.
@@ -29,6 +33,10 @@ const (
 type CartClient interface {
 	AddToCart(ctx context.Context, in *AddToCartRequest, opts ...grpc.CallOption) (*AddToCartResponse, error)
 	GetCart(ctx context.Context, in *GetCartRequest, opts ...grpc.CallOption) (*GetCartResponse, error)
+	GetAllItemsFromCart(ctx context.Context, in *GetAllItemsFromCartRequest, opts ...grpc.CallOption) (*GetAllItemsFromCartResponse, error)
+	DoesCartExist(ctx context.Context, in *DoesCartExistRequest, opts ...grpc.CallOption) (*DoesCartExistReponse, error)
+	TotalAmountInCart(ctx context.Context, in *TotalAmountInCartRequest, opts ...grpc.CallOption) (*TotalAmountInCartResponse, error)
+	UpdateCartAfterOrder(ctx context.Context, in *UpdateCartAfterOrderRequest, opts ...grpc.CallOption) (*UpdateCartAfterOrderResponse, error)
 }
 
 type cartClient struct {
@@ -57,12 +65,52 @@ func (c *cartClient) GetCart(ctx context.Context, in *GetCartRequest, opts ...gr
 	return out, nil
 }
 
+func (c *cartClient) GetAllItemsFromCart(ctx context.Context, in *GetAllItemsFromCartRequest, opts ...grpc.CallOption) (*GetAllItemsFromCartResponse, error) {
+	out := new(GetAllItemsFromCartResponse)
+	err := c.cc.Invoke(ctx, Cart_GetAllItemsFromCart_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cartClient) DoesCartExist(ctx context.Context, in *DoesCartExistRequest, opts ...grpc.CallOption) (*DoesCartExistReponse, error) {
+	out := new(DoesCartExistReponse)
+	err := c.cc.Invoke(ctx, Cart_DoesCartExist_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cartClient) TotalAmountInCart(ctx context.Context, in *TotalAmountInCartRequest, opts ...grpc.CallOption) (*TotalAmountInCartResponse, error) {
+	out := new(TotalAmountInCartResponse)
+	err := c.cc.Invoke(ctx, Cart_TotalAmountInCart_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cartClient) UpdateCartAfterOrder(ctx context.Context, in *UpdateCartAfterOrderRequest, opts ...grpc.CallOption) (*UpdateCartAfterOrderResponse, error) {
+	out := new(UpdateCartAfterOrderResponse)
+	err := c.cc.Invoke(ctx, Cart_UpdateCartAfterOrder_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CartServer is the server API for Cart service.
 // All implementations must embed UnimplementedCartServer
 // for forward compatibility
 type CartServer interface {
 	AddToCart(context.Context, *AddToCartRequest) (*AddToCartResponse, error)
 	GetCart(context.Context, *GetCartRequest) (*GetCartResponse, error)
+	GetAllItemsFromCart(context.Context, *GetAllItemsFromCartRequest) (*GetAllItemsFromCartResponse, error)
+	DoesCartExist(context.Context, *DoesCartExistRequest) (*DoesCartExistReponse, error)
+	TotalAmountInCart(context.Context, *TotalAmountInCartRequest) (*TotalAmountInCartResponse, error)
+	UpdateCartAfterOrder(context.Context, *UpdateCartAfterOrderRequest) (*UpdateCartAfterOrderResponse, error)
 	mustEmbedUnimplementedCartServer()
 }
 
@@ -75,6 +123,18 @@ func (UnimplementedCartServer) AddToCart(context.Context, *AddToCartRequest) (*A
 }
 func (UnimplementedCartServer) GetCart(context.Context, *GetCartRequest) (*GetCartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCart not implemented")
+}
+func (UnimplementedCartServer) GetAllItemsFromCart(context.Context, *GetAllItemsFromCartRequest) (*GetAllItemsFromCartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllItemsFromCart not implemented")
+}
+func (UnimplementedCartServer) DoesCartExist(context.Context, *DoesCartExistRequest) (*DoesCartExistReponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DoesCartExist not implemented")
+}
+func (UnimplementedCartServer) TotalAmountInCart(context.Context, *TotalAmountInCartRequest) (*TotalAmountInCartResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TotalAmountInCart not implemented")
+}
+func (UnimplementedCartServer) UpdateCartAfterOrder(context.Context, *UpdateCartAfterOrderRequest) (*UpdateCartAfterOrderResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCartAfterOrder not implemented")
 }
 func (UnimplementedCartServer) mustEmbedUnimplementedCartServer() {}
 
@@ -125,6 +185,78 @@ func _Cart_GetCart_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Cart_GetAllItemsFromCart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllItemsFromCartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartServer).GetAllItemsFromCart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Cart_GetAllItemsFromCart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartServer).GetAllItemsFromCart(ctx, req.(*GetAllItemsFromCartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cart_DoesCartExist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DoesCartExistRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartServer).DoesCartExist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Cart_DoesCartExist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartServer).DoesCartExist(ctx, req.(*DoesCartExistRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cart_TotalAmountInCart_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TotalAmountInCartRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartServer).TotalAmountInCart(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Cart_TotalAmountInCart_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartServer).TotalAmountInCart(ctx, req.(*TotalAmountInCartRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Cart_UpdateCartAfterOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCartAfterOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CartServer).UpdateCartAfterOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Cart_UpdateCartAfterOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CartServer).UpdateCartAfterOrder(ctx, req.(*UpdateCartAfterOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Cart_ServiceDesc is the grpc.ServiceDesc for Cart service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +271,22 @@ var Cart_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCart",
 			Handler:    _Cart_GetCart_Handler,
+		},
+		{
+			MethodName: "GetAllItemsFromCart",
+			Handler:    _Cart_GetAllItemsFromCart_Handler,
+		},
+		{
+			MethodName: "DoesCartExist",
+			Handler:    _Cart_DoesCartExist_Handler,
+		},
+		{
+			MethodName: "TotalAmountInCart",
+			Handler:    _Cart_TotalAmountInCart_Handler,
+		},
+		{
+			MethodName: "UpdateCartAfterOrder",
+			Handler:    _Cart_UpdateCartAfterOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
