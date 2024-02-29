@@ -34,7 +34,6 @@ message OrderDetails{
 }
 message OrderProductDetails{
     int64 ProductID=1;
-    string ProductName=2;
     int64 Quantity=3;
     float Price=4;
 }

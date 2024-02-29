@@ -55,10 +55,9 @@ func (or *OrderServer) GetOrderDetails(ctx context.Context, req *pb.GetOrderDeta
 		var orderProductDetails []*pb.OrderProductDetails
 		for _, product := range v.OrderProductDetails {
 			orderProduct := &pb.OrderProductDetails{
-				ProductID:   int64(product.ProductID),
-				ProductName: product.ProductName,
-				Quantity:    int64(product.Quantity),
-				Price:       float32(product.TotalPrice),
+				ProductID: int64(product.ProductID),
+				Quantity:  int64(product.Quantity),
+				Price:     float32(product.TotalPrice),
 			}
 			orderProductDetails = append(orderProductDetails, orderProduct)
 		}

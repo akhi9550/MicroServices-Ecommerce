@@ -2,9 +2,10 @@ package usecase
 
 import (
 	"errors"
-	
-	"order/service/pkg/domain"
+	"fmt"
+
 	clienterface "order/service/pkg/client/interface"
+	"order/service/pkg/domain"
 	interfaces "order/service/pkg/repository/interface"
 	services "order/service/pkg/usecase/interface"
 	"order/service/pkg/util/models"
@@ -13,14 +14,16 @@ import (
 )
 
 type orderUseCase struct {
-	orderRepository interfaces.OrderRepository
-	cartRepository  clienterface.CartClient
+	orderRepository   interfaces.OrderRepository
+	cartRepository    clienterface.CartClient
+	productRepository clienterface.ProductClient
 }
 
-func NewOrderUseCase(repository interfaces.OrderRepository, cartRepo clienterface.CartClient) services.OrderUseCase {
+func NewOrderUseCase(repository interfaces.OrderRepository, cartRepo clienterface.CartClient, productRepo clienterface.ProductClient) services.OrderUseCase {
 	return &orderUseCase{
-		orderRepository: repository,
-		cartRepository:  cartRepo,
+		orderRepository:   repository,
+		cartRepository:    cartRepo,
+		productRepository: productRepo,
 	}
 }
 func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, userID int) (domain.OrderSuccessResponse, error) {
@@ -30,7 +33,7 @@ func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, u
 		return domain.OrderSuccessResponse{}, err
 	}
 	orderBody.UserID = userID
-	cartExist, err := or.orderRepository.DoesCartExist(userID)
+	cartExist, err := or.cartRepository.DoesCartExist(userID)
 	if err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
@@ -46,13 +49,22 @@ func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, u
 	if !addressExist {
 		return domain.OrderSuccessResponse{}, errors.New("address does not exist")
 	}
-	
+
+	paymentExist, err := or.orderRepository.PaymentExist(orderBody)
+	if err != nil {
+		return domain.OrderSuccessResponse{}, err
+	}
+
+	if !paymentExist {
+		return domain.OrderSuccessResponse{}, errors.New("payment does not exist")
+	}
+
 	cartItems, err := or.cartRepository.GetAllItemsFromCart(orderBody.UserID)
 	if err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
 
-	total, err := or.orderRepository.TotalAmountInCart(orderBody.UserID)
+	total, err := or.cartRepository.TotalAmountInCart(orderBody.UserID)
 	if err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
@@ -62,7 +74,7 @@ func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, u
 	if err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
-
+	fmt.Println("🔗", order_id)
 	if err := or.orderRepository.AddOrderProducts(order_id, cartItems); err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
@@ -75,7 +87,11 @@ func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, u
 	for _, c := range cartItems {
 		orderItemDetails.ProductID = c.ProductID
 		orderItemDetails.Quantity = c.Quantity
-		err := or.orderRepository.UpdateCartAfterOrder(userID, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
+		err := or.cartRepository.UpdateCartAfterOrder(userID, int(orderItemDetails.ProductID), orderItemDetails.Quantity)
+		if err != nil {
+			return domain.OrderSuccessResponse{}, err
+		}
+		err = or.productRepository.ProductStockMinus(int(orderItemDetails.ProductID), int(orderItemDetails.Quantity))
 		if err != nil {
 			return domain.OrderSuccessResponse{}, err
 		}

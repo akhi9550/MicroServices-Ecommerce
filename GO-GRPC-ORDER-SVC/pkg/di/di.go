@@ -18,8 +18,9 @@ func InitializeAPI(cfg config.Config) (*server.Server, error) {
 	}
 
 	orderRepository := repository.NewOrderRepository(gormDB)
-	cartClient := client.NewCartClient(cfg)
-	orderUseCase := usecase.NewOrderUseCase(orderRepository, cartClient)
+	cartClient := client.NewCartClient(&cfg)
+	productClient:=client.NewProductClient(&cfg)
+	orderUseCase := usecase.NewOrderUseCase(orderRepository, cartClient,productClient)
 
 	orderServiceServer := service.NewOrderServer(orderUseCase)
 	grpcServer, err := server.NewGRPCServer(cfg, orderServiceServer)
