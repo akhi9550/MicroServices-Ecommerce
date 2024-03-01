@@ -14,7 +14,7 @@ type Config struct {
 }
 
 var envs = []string{
-	"PORT", "USER_SVC", "PRODUCT_SVC_URL", "ORDER_SVC_URL", "ADMIN_SVC_URL", "CART_SVC_URL",
+	"PORT", "USER_SVC_URL", "PRODUCT_SVC_URL", "ORDER_SVC_URL", "ADMIN_SVC_URL", "CART_SVC_URL",
 }
 
 func LoadConfig() (Config, error) {
