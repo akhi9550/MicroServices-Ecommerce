@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"fmt"
 
 	clienterface "order/service/pkg/client/interface"
 	"order/service/pkg/domain"
@@ -74,7 +73,6 @@ func (or *orderUseCase) OrderItemsFromCart(orderFromCart models.OrderFromCart, u
 	if err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
-	fmt.Println("🔗", order_id)
 	if err := or.orderRepository.AddOrderProducts(order_id, cartItems); err != nil {
 		return domain.OrderSuccessResponse{}, err
 	}
